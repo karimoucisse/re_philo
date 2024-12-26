@@ -6,7 +6,7 @@
 /*   By: kcisse <kcisse@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 23:47:54 by kcisse            #+#    #+#             */
-/*   Updated: 2024/12/27 00:36:28 by kcisse           ###   ########.fr       */
+/*   Updated: 2024/12/27 00:50:04 by kcisse           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,4 +66,7 @@ void	clean_prog(t_prog *prog, int status);
 // INIT
 int		init_struct(char **av, t_prog *m, t_philo *p,
 						pthread_mutex_t *f);
+// ROUTINE
+void	*routine(void *data);
+
 #endif

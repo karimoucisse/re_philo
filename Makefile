@@ -3,7 +3,7 @@ CC = cc
 UTILS = utils/
 UTILS_CFILES = $(UTILS)ft_atoi.c $(UTILS)ft_strchr.c $(UTILS)ft_strlen.c\
 		$(UTILS)utils.c
-CFILES = philo.c errors.c checker.c init.c $(UTILS_CFILES)
+CFILES = philo.c errors.c checker.c init.c $(UTILS_CFILES) routine.c
 CFLAGS = -Wall -Werror -Wextra -pthread -g
 OFILES = $(CFILES:.c=.o)
 RM = rm -f
