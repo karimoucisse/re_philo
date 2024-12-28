@@ -6,52 +6,96 @@
 /*   By: kcisse <kcisse@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 23:52:00 by kcisse            #+#    #+#             */
-/*   Updated: 2024/12/27 00:46:01 by kcisse           ###   ########.fr       */
+/*   Updated: 2024/12/28 02:39:30 by kcisse           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int start_prog(t_prog prog)
-{
-	int i;
-
-	i = -1;
-	while (++i < prog.nb_of_philo)
-	{
-		if (pthread_create(&prog.philo[i].p_thread, NULL, &routine,
-				&(prog.philo[i])) != 0)
-			prog_destroyer(&prog, 1);
-	}
-	return (1);
-}
-int monitoring(t_prog prog)
-{
-
-}
-int end_prog(t_prog prog)
+int	start_prog(t_prog prog)
 {
 	int	i;
 
 	i = -1;
 	while (++i < prog.nb_of_philo)
 	{
-		if (pthread_join(prog.philo[i].p_thread, NULL) != 0)
-			prog_destroyer(&prog, 1);
+		if (pthread_create(&prog.philos[i].p_thread, NULL, &routine,
+				&(prog.philos[i])) != 0)
+			clean_prog(&prog, 1);
 	}
 	return (1);
 }
 
-int main(int ac, char **av)
+int	ft_philo_is_dead(t_philo *philo)
 {
-	t_prog prog;
-	t_philo philo[200];
-	pthread_mutex_t forks[200];
+	time_t	current_time;
+
+	current_time = get_time();
+	if(current_time - philo->last_meal > philo->prog->time_to_die)
+	{
+		pthread_mutex_lock(&philo->prog->dead_lock);
+		philo->prog->is_dead = 1;
+		pthread_mutex_unlock(&philo->prog->dead_lock);
+		print_msg(philo, "died");
+		return (1);
+	}
+	return (0);
+}
+
+int	ft_handle_conditions(t_prog *prog)
+{
+	int	i;
+	int	nbr_full_philo;
+
+	i = -1;
+	nbr_full_philo = 0;
+	while (++i < prog->nb_of_philo)
+	{
+		pthread_mutex_lock(&prog->philos[i].eat_lock);
+		if (ft_philo_is_dead(&prog->philos[i]))
+			return (1);
+		if(prog->philos[i].nbr_of_time_ate == prog->eat_count)
+			nbr_full_philo++;
+		pthread_mutex_unlock(&prog->philos[i].eat_lock);
+	}
+	if(nbr_full_philo == prog->nb_of_philo)
+		return (1);
+	return (0);
+}
+
+void	monitoring(t_prog *prog)
+{
+	while (true)
+	{
+		usleep(500);
+		if (ft_handle_conditions(prog))
+			break ;
+	}
+}
+
+int	end_prog(t_prog *prog)
+{
+	int	i;
+
+	i = -1;
+	while (++i < prog->nb_of_philo)
+	{
+		if (pthread_join(prog->philos[i].p_thread, NULL) != 0)
+			clean_prog(prog, 1);
+	}
+	return (1);
+}
+
+int	main(int ac, char **av)
+{
+	t_prog			prog;
+	t_philo			philos[200];
+	pthread_mutex_t	forks[200];
 
 	check_args(ac, av);
-	if (!init_struct(av, &prog, philo, forks))
+	if (!init_struct(av, &prog, philos, forks))
 		clean_prog(&prog, EXIT_FAILURE);
-	start_prog(&prog);
+	start_prog(prog);
 	monitoring(&prog);
 	end_prog(&prog);
 	clean_prog(&prog, EXIT_FAILURE);
