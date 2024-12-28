@@ -6,7 +6,7 @@
 /*   By: kcisse <kcisse@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 23:47:54 by kcisse            #+#    #+#             */
-/*   Updated: 2024/12/28 02:38:39 by kcisse           ###   ########.fr       */
+/*   Updated: 2024/12/28 03:12:34 by kcisse           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@
 # include <string.h>
 # include <sys/time.h>
 # include <unistd.h>
-# include <stdbool.h>
 # include "./utils/utils.h"
 
 struct s_prog;
@@ -29,7 +28,6 @@ typedef struct s_philo
 	pthread_t		p_thread;
 	int				id;
 	int				nbr_of_time_ate;
-	int 			eat_nrb_time;
 	pthread_mutex_t	eat_lock;
 	time_t			last_meal;
 	pthread_mutex_t	*l_fork;
@@ -44,8 +42,8 @@ typedef struct s_prog
 	time_t			time_to_die;
 	time_t			time_to_eat;
 	time_t			time_to_sleep;
-	int 			eat_count;
-	bool			is_dead;
+	int 			max_eat_count;
+	int				is_dead;
 	pthread_mutex_t	*forks_locks;
 	pthread_mutex_t	dead_lock;
 	pthread_mutex_t	print_lock;
@@ -60,11 +58,10 @@ void	error_printer(char *msg);
 void	clean_prog(t_prog *prog, int status);
 
 // INIT
-int		init_struct(char **av, t_prog *m, t_philo *p,
-						pthread_mutex_t *f);
+t_prog	*init_struct(char **av);
 // ROUTINE
 void	*routine(void *data);
-int stop_prog(t_philo *philo);
+int		stop_prog(t_philo *philo);
 
 // UTILS
 long	get_time(void);

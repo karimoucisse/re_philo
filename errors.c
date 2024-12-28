@@ -6,7 +6,7 @@
 /*   By: kcisse <kcisse@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/18 15:59:55 by kcisse            #+#    #+#             */
-/*   Updated: 2024/12/28 02:40:53 by kcisse           ###   ########.fr       */
+/*   Updated: 2024/12/28 02:46:49 by kcisse           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,6 @@ void	clean_prog(t_prog *prog, int status)
 			pthread_mutex_destroy(&(prog->forks_locks[i]));
 		pthread_mutex_destroy(&(prog->philos[i].eat_lock));
 	}
+	free(prog);
 	exit(status);
 }

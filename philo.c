@@ -6,22 +6,22 @@
 /*   By: kcisse <kcisse@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 23:52:00 by kcisse            #+#    #+#             */
-/*   Updated: 2024/12/28 02:39:30 by kcisse           ###   ########.fr       */
+/*   Updated: 2024/12/28 03:13:37 by kcisse           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	start_prog(t_prog prog)
+int	start_prog(t_prog *prog)
 {
 	int	i;
 
 	i = -1;
-	while (++i < prog.nb_of_philo)
+	while (++i < prog->nb_of_philo)
 	{
-		if (pthread_create(&prog.philos[i].p_thread, NULL, &routine,
-				&(prog.philos[i])) != 0)
-			clean_prog(&prog, 1);
+		if (pthread_create(&prog->philos[i].p_thread, NULL, &routine,
+				&(prog->philos[i])) != 0)
+			clean_prog(prog, 1);
 	}
 	return (1);
 }
@@ -54,7 +54,7 @@ int	ft_handle_conditions(t_prog *prog)
 		pthread_mutex_lock(&prog->philos[i].eat_lock);
 		if (ft_philo_is_dead(&prog->philos[i]))
 			return (1);
-		if(prog->philos[i].nbr_of_time_ate == prog->eat_count)
+		if(prog->philos[i].nbr_of_time_ate == prog->max_eat_count)
 			nbr_full_philo++;
 		pthread_mutex_unlock(&prog->philos[i].eat_lock);
 	}
@@ -65,7 +65,7 @@ int	ft_handle_conditions(t_prog *prog)
 
 void	monitoring(t_prog *prog)
 {
-	while (true)
+	while (1)
 	{
 		usleep(500);
 		if (ft_handle_conditions(prog))
@@ -88,15 +88,20 @@ int	end_prog(t_prog *prog)
 
 int	main(int ac, char **av)
 {
-	t_prog			prog;
-	t_philo			philos[200];
-	pthread_mutex_t	forks[200];
+	t_prog			*prog;
 
 	check_args(ac, av);
-	if (!init_struct(av, &prog, philos, forks))
-		clean_prog(&prog, EXIT_FAILURE);
-	start_prog(prog);
-	monitoring(&prog);
-	end_prog(&prog);
-	clean_prog(&prog, EXIT_FAILURE);
+	prog = init_struct(av);
+	if(!prog)
+		clean_prog(prog, EXIT_FAILURE);
+	int i = 0;
+	while(i < prog->nb_of_philo)
+	{
+		printf("philo %d\n", prog->philos[i].id);
+		i++;
+	}
+	// start_prog(prog);
+	// monitoring(prog);
+	// end_prog(prog);
+	clean_prog(prog, EXIT_FAILURE);
 }
